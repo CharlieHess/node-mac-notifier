@@ -38,7 +38,7 @@ MacNotification::~MacNotification() {
 
 NAN_METHOD(MacNotification::New) {
   if (info.IsConstructCall()) {
-    std::string title = *String::Utf8Value(info[0]);
+    const char* title = *Nan::Utf8String(info[0]);
     
     MaybeLocal<Object> options = Nan::To<Object>(info[1]);
     if (options.IsEmpty()) {
@@ -46,14 +46,10 @@ NAN_METHOD(MacNotification::New) {
       return;
     }
     
-    MaybeLocal<Value> maybeBody = Nan::Get(options.ToLocalChecked(), Nan::New("body").ToLocalChecked());
-    Local<String> bodyOrEmptyString = maybeBody.IsEmpty() ?
-      Nan::New("").ToLocalChecked() :
-      Nan::To<String>(maybeBody.ToLocalChecked()).ToLocalChecked();
+    MaybeLocal<Value> maybeBody = Nan::Get(info[1].As<Object>(), Nan::New("body").ToLocalChecked());
+    const char* body = *Nan::Utf8String(maybeBody.ToLocalChecked());
 
-    std::string body = *String::Utf8Value(bodyOrEmptyString);
-    
-    MacNotification *notification = new MacNotification(title.c_str(), body.c_str());
+    MacNotification *notification = new MacNotification(title, body);
     
     notification->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
