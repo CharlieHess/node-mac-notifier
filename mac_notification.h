@@ -10,13 +10,15 @@ class MacNotification : public Nan::ObjectWrap {
     static NAN_MODULE_INIT(Init);
 
   private:
-    explicit MacNotification(std::string title);
+    explicit MacNotification(const char* title, const char* informativeText);
     ~MacNotification();
 
     static NAN_METHOD(New);
-    static NAN_METHOD(GetTitle);
+    static NAN_GETTER(GetTitle);
     static Nan::Persistent<Function> constructor;
-    std::string title_;
+    
+    const char* _title;
+    const char* _informativeText;
 };
 
 #endif

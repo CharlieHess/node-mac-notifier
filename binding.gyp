@@ -3,7 +3,8 @@
     "target_name": "Notification",
     "sources": [
       "Notification.cc",
-      "mac_notification.mm"
+      "mac_notification.mm",
+      "notification_center_delegate.mm"
     ],
     "include_dirs": [
       "<!(node -e \"require('nan')\")"
