@@ -18,12 +18,29 @@ NAN_MODULE_INIT(MacNotification::Init) {
   Nan::Set(target, Nan::New("MacNotification").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-MacNotification::MacNotification(Nan::Utf8String *title, Nan::Utf8String *informativeText) :
+MacNotification::MacNotification(Nan::Utf8String *title, 
+  Nan::Utf8String *informativeText,
+  Nan::Callback *onClick,
+  Nan::Callback *onReply) :
   _title(title),
-  _informativeText(informativeText) {
+  _informativeText(informativeText),
+  _onClick(onClick),
+  _onReply(onReply) {
+
+  ClickCallback clickCallback = ^void() {
+    _onClick->Call(0, 0);
+  };
+  
+  ReplyCallback replyCallback = ^void(const char *response) {
+    Local<Value> argv[1] = { 
+      Nan::New(response).ToLocalChecked()
+    };
+    _onReply->Call(1, argv);
+  };
   
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
-  NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] init];
+  NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc]
+    initWithClickCallback:clickCallback replyCallback:replyCallback];
   center.delegate = delegate;
   
   NSUserNotification *notification = [[NSUserNotification alloc] init];
@@ -36,6 +53,8 @@ MacNotification::MacNotification(Nan::Utf8String *title, Nan::Utf8String *inform
 MacNotification::~MacNotification() {
   delete _title;
   delete _informativeText;
+  delete _onClick;
+  delete _onReply;
 }
 
 NAN_METHOD(MacNotification::New) {
@@ -55,8 +74,14 @@ NAN_METHOD(MacNotification::New) {
     
     MaybeLocal<Value> maybeBody = Nan::Get(info[1].As<Object>(), Nan::New("body").ToLocalChecked());
     Nan::Utf8String *body = new Nan::Utf8String(maybeBody.ToLocalChecked());
+    
+    Local<Function> onClickHandle = info[2].As<Function>();
+    Nan::Callback *onClick = new Nan::Callback(onClickHandle);
+    
+    Local<Function> onReplyHandle = info[3].As<Function>();
+    Nan::Callback *onReply = new Nan::Callback(onReplyHandle);
 
-    MacNotification *notification = new MacNotification(title, body);
+    MacNotification *notification = new MacNotification(title, body, onClick, onReply);
     
     notification->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
