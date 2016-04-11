@@ -18,36 +18,43 @@ NAN_MODULE_INIT(MacNotification::Init) {
   Nan::Set(target, Nan::New("MacNotification").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-MacNotification::MacNotification(const char* title, const char* informativeText) :
+MacNotification::MacNotification(Nan::Utf8String *title, Nan::Utf8String *informativeText) :
   _title(title),
   _informativeText(informativeText) {
-    
+  
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] init];
   center.delegate = delegate;
   
   NSUserNotification *notification = [[NSUserNotification alloc] init];
-  notification.title = [NSString stringWithUTF8String:title];
-  notification.informativeText = [NSString stringWithUTF8String:informativeText];
+  notification.title = [NSString stringWithUTF8String:**title];
+  notification.informativeText = [NSString stringWithUTF8String:**informativeText];
   
   [center deliverNotification:notification];
 }
 
 MacNotification::~MacNotification() {
+  delete _title;
+  delete _informativeText;
 }
 
 NAN_METHOD(MacNotification::New) {
   if (info.IsConstructCall()) {
-    const char* title = *Nan::Utf8String(info[0]);
+    if (info[0]->IsUndefined()) {
+      Nan::ThrowError("Title is required");
+      return;
+    }
     
+    Nan::Utf8String *title = new Nan::Utf8String(info[0]);
     MaybeLocal<Object> options = Nan::To<Object>(info[1]);
+    
     if (options.IsEmpty()) {
-      Nan::ThrowError("Notification options are required");
+      Nan::ThrowError("Options are required");
       return;
     }
     
     MaybeLocal<Value> maybeBody = Nan::Get(info[1].As<Object>(), Nan::New("body").ToLocalChecked());
-    const char* body = *Nan::Utf8String(maybeBody.ToLocalChecked());
+    Nan::Utf8String *body = new Nan::Utf8String(maybeBody.ToLocalChecked());
 
     MacNotification *notification = new MacNotification(title, body);
     
@@ -63,6 +70,6 @@ NAN_METHOD(MacNotification::New) {
 
 NAN_GETTER(MacNotification::GetTitle) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
-  Nan::MaybeLocal<String> result = Nan::New<String>(notification->_title);
-  info.GetReturnValue().Set(result.ToLocalChecked());
+  Nan::MaybeLocal<String> title = Nan::New<String>(**(notification->_title));
+  info.GetReturnValue().Set(title.ToLocalChecked());
 }

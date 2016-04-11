@@ -2,9 +2,13 @@ var Notification = require('../');
 var assert = require('assert');
 
 describe('Mac Notification', function() {
-  it('should require an options argument', function() {
+  it('should require both title and options arguments', function() {
     assert.throws(function() {
-      var notification = new Notification('hi');
+      var notification = new Notification();
+    });
+    
+    assert.throws(function() {
+      var notification = new Notification('something');
     });
   });
   
