@@ -13,6 +13,7 @@ NAN_MODULE_INIT(MacNotification::Init) {
   tpl->InstanceTemplate()->SetInternalFieldCount(2);
 
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("title").ToLocalChecked(), GetTitle);
+  Nan::SetPrototypeMethod(tpl, "doClick", DoClick);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("MacNotification").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -96,4 +97,10 @@ NAN_GETTER(MacNotification::GetTitle) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
   Nan::MaybeLocal<String> title = Nan::New<String>(**(notification->_title));
   info.GetReturnValue().Set(title.ToLocalChecked());
+}
+
+NAN_METHOD(MacNotification::DoClick) {
+  MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
+  notification->OnClick();
+  info.GetReturnValue().SetUndefined();
 }

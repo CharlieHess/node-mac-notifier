@@ -21,6 +21,7 @@ class MacNotification : public Nan::ObjectWrap {
 
     static NAN_METHOD(New);
     static NAN_GETTER(GetTitle);
+    static NAN_METHOD(DoClick);
     static Nan::Persistent<Function> constructor;
 
     Nan::Utf8String *_title;

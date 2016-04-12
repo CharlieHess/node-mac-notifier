@@ -17,4 +17,13 @@ describe('Mac Notification', function() {
     var notification = new Notification(title, {});
     assert.equal(notification.title, title);
   });
+  
+  it('should invoke the click callback', function() {
+    var wasInvoked = false;
+    var notification = new Notification('click me', {}, function() {
+      wasInvoked = true;
+    });
+    notification.doClick();
+    assert.ok(wasInvoked);
+  });
 });
