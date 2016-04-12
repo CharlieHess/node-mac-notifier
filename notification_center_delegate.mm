@@ -5,6 +5,10 @@
 uv_loop_t *defaultLoop = uv_default_loop();
 uv_async_t async;
 
+/**
+ * This handler runs in the V8 context as a result of `uv_async_send`. Here we
+ * retrieve our event information and invoke the saved callback.
+ */ 
 static void AsyncSendHandler(uv_async_t *handle) {
   Nan::HandleScope scope;
   NotificationActivationInfo *info = static_cast<NotificationActivationInfo *>(handle->data);
@@ -17,6 +21,10 @@ static void AsyncSendHandler(uv_async_t *handle) {
   info->callback->Call(2, argv);
 }
 
+/**
+ * We save off the JavaScript callback here and initialize the libuv event
+ * loop, which is needed in order to invoke the callback.
+ */ 
 - (id)initWithActivationCallback:(Nan::Callback *)onActivation 
 {
   if (self = [super init]) {
@@ -28,12 +36,9 @@ static void AsyncSendHandler(uv_async_t *handle) {
   return self;
 }
 
-- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
-     shouldPresentNotification:(NSUserNotification *)notification
-{
-  return YES;
-}
-
+/**
+ * Occurs when the user activates a notification by clicking it or replying.
+ */ 
 - (void)userNotificationCenter:(NSUserNotificationCenter *)center
        didActivateNotification:(NSUserNotification *)notification
 {
@@ -46,8 +51,17 @@ static void AsyncSendHandler(uv_async_t *handle) {
     Info.response = "";
   }
   
+  // Stash a pointer to the activation information and push it onto the libuv
+  // event loop. Note that the info must be class-local otherwise it'll be
+  // garbage collected before the event is handled.
   async.data = &Info;
   uv_async_send(&async);
+}
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
+     shouldPresentNotification:(NSUserNotification *)notification
+{
+  return YES;
 }
 
 @end
