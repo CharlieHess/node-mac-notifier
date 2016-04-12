@@ -3,14 +3,14 @@
 
 #include <nan.h>
 
-typedef void (^ClickCallback)();
-typedef void (^ReplyCallback)(const char *response);
-
 using namespace v8;
 
 class MacNotification : public Nan::ObjectWrap {
   public:
     static NAN_MODULE_INIT(Init);
+    
+    void OnClick();
+    void OnReply(const char *response);
 
   private:
     explicit MacNotification(Nan::Utf8String *title, 

@@ -2,12 +2,10 @@
 
 @implementation NotificationCenterDelegate
 
-- (id)initWithClickCallback:(ClickCallback)onClick
-              replyCallback:(ReplyCallback)onReply
+- (id)initWithNotification:(MacNotification *)notification
 {
   if (self = [super init]) {
-    OnClick = onClick;
-    OnReply = onReply;
+    Notification = notification;
   }
 
   return self;
@@ -23,9 +21,9 @@
        didActivateNotification:(NSUserNotification *)notification
 {
   if (notification.activationType == NSUserNotificationActivationTypeReplied) {
-    OnReply(notification.response.string.UTF8String);
+    Notification->OnReply(notification.response.string.UTF8String);
   } else {
-    OnClick();
+    Notification->OnClick();
   }
 }
 

@@ -1,16 +1,13 @@
 #import <Foundation/Foundation.h>
 
-typedef void (^ClickCallback)();
-typedef void (^ReplyCallback)(const char *response);
+#include "mac_notification.h"
 
 @interface NotificationCenterDelegate : NSObject<NSUserNotificationCenterDelegate>
 {
-  ClickCallback OnClick;
-  ReplyCallback OnReply;
+  MacNotification *Notification;
 }
 
-- (id)initWithClickCallback:(ClickCallback)onClick
-              replyCallback:(ReplyCallback)onReply;
+- (id)initWithNotification:(MacNotification *)notification;
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
      shouldPresentNotification:(NSUserNotification *)notification;

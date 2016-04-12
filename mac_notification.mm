@@ -27,20 +27,8 @@ MacNotification::MacNotification(Nan::Utf8String *title,
   _onClick(onClick),
   _onReply(onReply) {
 
-  ClickCallback clickCallback = ^void() {
-    _onClick->Call(0, 0);
-  };
-  
-  ReplyCallback replyCallback = ^void(const char *response) {
-    Local<Value> argv[1] = { 
-      Nan::New(response).ToLocalChecked()
-    };
-    _onReply->Call(1, argv);
-  };
-  
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
-  NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc]
-    initWithClickCallback:clickCallback replyCallback:replyCallback];
+  NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] initWithNotification:this];
   center.delegate = delegate;
   
   NSUserNotification *notification = [[NSUserNotification alloc] init];
@@ -55,6 +43,17 @@ MacNotification::~MacNotification() {
   delete _informativeText;
   delete _onClick;
   delete _onReply;
+}
+
+void MacNotification::OnClick() {
+  _onClick->Call(0, 0);
+}
+
+void MacNotification::OnReply(const char *response) {
+  Local<Value> argv[1] = { 
+    Nan::New(response).ToLocalChecked()
+  };
+  _onReply->Call(1, argv);
 }
 
 NAN_METHOD(MacNotification::New) {
