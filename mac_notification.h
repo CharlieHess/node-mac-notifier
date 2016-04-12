@@ -10,8 +10,7 @@ class MacNotification : public Nan::ObjectWrap {
     static NAN_MODULE_INIT(Init);
 
   private:
-    explicit MacNotification(Nan::Utf8String *title, 
-      Nan::Utf8String *informativeText);
+    explicit MacNotification(Nan::Utf8String *title, Nan::Utf8String *body);
     ~MacNotification();
 
     static NAN_METHOD(New);
@@ -19,7 +18,7 @@ class MacNotification : public Nan::ObjectWrap {
     static Nan::Persistent<Function> constructor;
 
     Nan::Utf8String *_title;
-    Nan::Utf8String *_informativeText;
+    Nan::Utf8String *_body;
 };
 
 #endif

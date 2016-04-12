@@ -18,14 +18,12 @@ NAN_MODULE_INIT(MacNotification::Init) {
   Nan::Set(target, Nan::New("MacNotification").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-MacNotification::MacNotification(Nan::Utf8String *title, 
-  Nan::Utf8String *informativeText) :
-  _title(title),
-  _informativeText(informativeText) {
+MacNotification::MacNotification(Nan::Utf8String *title, Nan::Utf8String *body)
+  : _title(title), _body(body) {
 
   NSUserNotification *notification = [[NSUserNotification alloc] init];
   notification.title = [NSString stringWithUTF8String:**title];
-  notification.informativeText = [NSString stringWithUTF8String:**informativeText];
+  notification.informativeText = [NSString stringWithUTF8String:**body];
   
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   [center deliverNotification:notification];
@@ -33,39 +31,32 @@ MacNotification::MacNotification(Nan::Utf8String *title,
 
 MacNotification::~MacNotification() {
   delete _title;
-  delete _informativeText;
+  delete _body;
 }
 
 NAN_METHOD(MacNotification::New) {
   if (info.IsConstructCall()) {
     if (info[0]->IsUndefined()) {
-      Nan::ThrowError("Title is required");
-      return;
-    }
-    
-    Nan::Utf8String *title = new Nan::Utf8String(info[0]);
-    MaybeLocal<Object> options = Nan::To<Object>(info[1]);
-    
-    if (options.IsEmpty()) {
       Nan::ThrowError("Options are required");
       return;
     }
     
-    MaybeLocal<Value> maybeBody = Nan::Get(info[1].As<Object>(), Nan::New("body").ToLocalChecked());
-    Nan::Utf8String *body = new Nan::Utf8String(maybeBody.ToLocalChecked());
-    
-    Local<Function> onClickHandle = info[2].As<Function>();
-    Nan::Callback *onClick = new Nan::Callback(onClickHandle);
-    
-    Local<Function> onReplyHandle = info[3].As<Function>();
-    Nan::Callback *onReply = new Nan::Callback(onReplyHandle);
+    Local<Object> options = info[0].As<Object>();
 
-    MacNotification *notification = new MacNotification(title, body);
+    MaybeLocal<Value> titleHandle = Nan::Get(options, Nan::New("title").ToLocalChecked());
+    Nan::Utf8String *title = new Nan::Utf8String(titleHandle.ToLocalChecked());
+    
+    MaybeLocal<Value> bodyHandle = Nan::Get(options, Nan::New("body").ToLocalChecked());
+    Nan::Utf8String *body = new Nan::Utf8String(bodyHandle.ToLocalChecked());
+
+    Local<Function> activatedHandle = Nan::Get(options, Nan::New("activated").ToLocalChecked()).ToLocalChecked().As<Function>();
+    Nan::Callback *activated = new Nan::Callback(activatedHandle);
 
     NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
     NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] initWithActivationCallback:activated];
     center.delegate = delegate;
     
+    MacNotification *notification = new MacNotification(title, body);
     notification->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   } else {
