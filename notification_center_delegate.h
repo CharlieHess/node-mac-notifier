@@ -3,14 +3,18 @@
 #include <nan.h>
 #include "mac_notification.h"
 
-@interface NotificationCenterDelegate : NSObject<NSUserNotificationCenterDelegate>
-{
-  Nan::Callback *OnClick;
-  Nan::Callback *OnReply;
+struct NotificationActivationInfo {
+  Nan::Callback *callback;
+  bool isReply;
+  const char *response;
+};
+
+@interface NotificationCenterDelegate : NSObject<NSUserNotificationCenterDelegate> {
+  Nan::Callback *OnActivation;
+  NotificationActivationInfo Info;
 }
 
-- (id)initWithClickCallback:(Nan::Callback *)onClick
-              replyCallback:(Nan::Callback *)onReply;
+- (id)initWithActivationCallback:(Nan::Callback *)onActivation;
               
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
      shouldPresentNotification:(NSUserNotification *)notification;

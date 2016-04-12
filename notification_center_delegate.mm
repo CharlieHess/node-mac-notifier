@@ -2,12 +2,27 @@
 
 @implementation NotificationCenterDelegate
 
-- (id)initWithClickCallback:(Nan::Callback *)onClick
-              replyCallback:(Nan::Callback *)onReply
+uv_loop_t *defaultLoop = uv_default_loop();
+uv_async_t async;
+
+static void AsyncSendHandler(uv_async_t *handle) {
+  Nan::HandleScope scope;
+  NotificationActivationInfo *info = static_cast<NotificationActivationInfo *>(handle->data);
+
+  v8::Local<v8::Value> argv[2] = {
+    Nan::New(info->isReply),
+    Nan::New(info->response).ToLocalChecked()
+  };
+  
+  info->callback->Call(2, argv);
+}
+
+- (id)initWithActivationCallback:(Nan::Callback *)onActivation 
 {
   if (self = [super init]) {
-    OnClick = onClick;
-    OnReply = onReply;
+    OnActivation = onActivation;
+    
+    uv_async_init(defaultLoop, &async, (uv_async_cb)AsyncSendHandler);
   }
 
   return self;
@@ -22,16 +37,17 @@
 - (void)userNotificationCenter:(NSUserNotificationCenter *)center
        didActivateNotification:(NSUserNotification *)notification
 {
-  Nan::HandleScope scope;
+  Info.isReply = notification.activationType == NSUserNotificationActivationTypeReplied;
+  Info.callback = OnActivation;
   
-  if (notification.activationType == NSUserNotificationActivationTypeReplied) {
-    v8::Local<v8::Value> argv[1] = { 
-      Nan::New(notification.response.string.UTF8String).ToLocalChecked()
-    };
-    OnReply->Call(1, argv);
+  if (Info.isReply) {
+    Info.response = notification.response.string.UTF8String;
   } else {
-    OnClick->Call(0, 0);
+    Info.response = "";
   }
+  
+  async.data = &Info;
+  uv_async_send(&async);
 }
 
 @end

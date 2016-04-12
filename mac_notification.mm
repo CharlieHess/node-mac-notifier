@@ -63,8 +63,7 @@ NAN_METHOD(MacNotification::New) {
     MacNotification *notification = new MacNotification(title, body);
 
     NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
-    NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc]
-      initWithClickCallback:onClick replyCallback: onReply];
+    NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] initWithActivationCallback:activated];
     center.delegate = delegate;
     
     notification->Wrap(info.This());
