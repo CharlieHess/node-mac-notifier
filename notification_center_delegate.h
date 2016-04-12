@@ -1,14 +1,17 @@
 #import <Foundation/Foundation.h>
 
+#include <nan.h>
 #include "mac_notification.h"
 
 @interface NotificationCenterDelegate : NSObject<NSUserNotificationCenterDelegate>
 {
-  MacNotification *Notification;
+  Nan::Callback *OnClick;
+  Nan::Callback *OnReply;
 }
 
-- (id)initWithNotification:(MacNotification *)notification;
-
+- (id)initWithClickCallback:(Nan::Callback *)onClick
+              replyCallback:(Nan::Callback *)onReply;
+              
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
      shouldPresentNotification:(NSUserNotification *)notification;
      

@@ -13,48 +13,27 @@ NAN_MODULE_INIT(MacNotification::Init) {
   tpl->InstanceTemplate()->SetInternalFieldCount(2);
 
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("title").ToLocalChecked(), GetTitle);
-  Nan::SetPrototypeMethod(tpl, "doClick", DoClick);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("MacNotification").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 MacNotification::MacNotification(Nan::Utf8String *title, 
-  Nan::Utf8String *informativeText,
-  Nan::Callback *onClick,
-  Nan::Callback *onReply) :
+  Nan::Utf8String *informativeText) :
   _title(title),
-  _informativeText(informativeText),
-  _onClick(onClick),
-  _onReply(onReply) {
+  _informativeText(informativeText) {
 
-  NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
-  NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] initWithNotification:this];
-  center.delegate = delegate;
-  
   NSUserNotification *notification = [[NSUserNotification alloc] init];
   notification.title = [NSString stringWithUTF8String:**title];
   notification.informativeText = [NSString stringWithUTF8String:**informativeText];
   
+  NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   [center deliverNotification:notification];
 }
 
 MacNotification::~MacNotification() {
   delete _title;
   delete _informativeText;
-  delete _onClick;
-  delete _onReply;
-}
-
-void MacNotification::OnClick() {
-  _onClick->Call(0, 0);
-}
-
-void MacNotification::OnReply(const char *response) {
-  Local<Value> argv[1] = { 
-    Nan::New(response).ToLocalChecked()
-  };
-  _onReply->Call(1, argv);
 }
 
 NAN_METHOD(MacNotification::New) {
@@ -81,7 +60,12 @@ NAN_METHOD(MacNotification::New) {
     Local<Function> onReplyHandle = info[3].As<Function>();
     Nan::Callback *onReply = new Nan::Callback(onReplyHandle);
 
-    MacNotification *notification = new MacNotification(title, body, onClick, onReply);
+    MacNotification *notification = new MacNotification(title, body);
+
+    NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
+    NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc]
+      initWithClickCallback:onClick replyCallback: onReply];
+    center.delegate = delegate;
     
     notification->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
@@ -97,10 +81,4 @@ NAN_GETTER(MacNotification::GetTitle) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
   Nan::MaybeLocal<String> title = Nan::New<String>(**(notification->_title));
   info.GetReturnValue().Set(title.ToLocalChecked());
-}
-
-NAN_METHOD(MacNotification::DoClick) {
-  MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
-  notification->OnClick();
-  info.GetReturnValue().SetUndefined();
 }

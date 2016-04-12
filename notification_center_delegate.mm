@@ -2,10 +2,12 @@
 
 @implementation NotificationCenterDelegate
 
-- (id)initWithNotification:(MacNotification *)notification
+- (id)initWithClickCallback:(Nan::Callback *)onClick
+              replyCallback:(Nan::Callback *)onReply
 {
   if (self = [super init]) {
-    Notification = notification;
+    OnClick = onClick;
+    OnReply = onReply;
   }
 
   return self;
@@ -21,9 +23,12 @@
        didActivateNotification:(NSUserNotification *)notification
 {
   if (notification.activationType == NSUserNotificationActivationTypeReplied) {
-    Notification->OnReply(notification.response.string.UTF8String);
+    v8::Local<v8::Value> argv[1] = { 
+      Nan::New(notification.response.string.UTF8String).ToLocalChecked()
+    };
+    OnReply->Call(1, argv);
   } else {
-    Notification->OnClick();
+    OnClick->Call(0, 0);
   }
 }
 
