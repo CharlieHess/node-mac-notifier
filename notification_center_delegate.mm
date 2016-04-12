@@ -22,6 +22,8 @@
 - (void)userNotificationCenter:(NSUserNotificationCenter *)center
        didActivateNotification:(NSUserNotification *)notification
 {
+  Nan::HandleScope scope;
+  
   if (notification.activationType == NSUserNotificationActivationTypeReplied) {
     v8::Local<v8::Value> argv[1] = { 
       Nan::New(notification.response.string.UTF8String).ToLocalChecked()
