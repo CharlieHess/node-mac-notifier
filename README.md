@@ -5,8 +5,11 @@ This is useful for desktop applications built with [Electron](http://electron.at
 ## Installation
 `npm install`
 
+## Run Tests
+`npm test`
+
 ## Usage
-Ensure that this module is called from a renderer process; it will have no effect from the main process.
+Ensure that this module is called from a renderer process; it will have no effect in the main process.
  
 ```js
 Notification = require('node-mac-notifier');
@@ -27,16 +30,15 @@ The title of the notification.
 ##### `options` (Object)
 Additional parameters to the notification.
 ##### `options.id` (string)
-A string identifying the notification. Maps to `NSUserNotification.identifier`. A notification with an matching a previously delivered notification will not be shown. If not provided, defaults to a RFC4122 v4 string.
+A string identifying the notification. Maps to `NSUserNotification.identifier`. A notification with an `id` matching a previously delivered notification will not be shown. If not provided, defaults to a RFC4122 v4 string.
 ##### `options.body` (string)
 The body text. Maps to `NSUserNotification.informativeText`.
 ##### `options.icon` (string)
 A URL with image content. Maps to `NSUserNotification.contentImage`.
+##### `options.soundName` (string)
+The name of a sound file to play once the notification is delivered. Maps to `NSUserNotification.soundName`. Set to `default` to use `NSUserNotificationDefaultSoundName`, or `null` or `undefined` for a silent notification.
 ##### `options.canReply` (bool)
 If true, this notification will have a reply action button, and can emit the `reply` event. Maps to `NSUserNotification.hasReplyButton`.
 
 ### `close()`
 Dismisses the notification immediately.
-
-## Run Tests
-`npm test`
