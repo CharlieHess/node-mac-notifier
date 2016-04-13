@@ -17,6 +17,7 @@ class MacNotification : public Nan::ObjectWrap {
     static void UnregisterDelegate();
 
     static NAN_METHOD(New);
+    static NAN_METHOD(Close);
     static NAN_GETTER(GetId);
     static NAN_GETTER(GetTitle);
     static NAN_GETTER(GetBody);

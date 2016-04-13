@@ -26,9 +26,12 @@ module.exports = class Notification extends EventTarget {
     };
 
     let args = Object.assign({title, activated}, options);
-    new MacNotification(args);
+    this.notification = new MacNotification(args);
   }
 
   close() {
+    this.notification.close();
+    this.notification = null;
+    this.dispatchEvent({type: 'close'});
   }
 };

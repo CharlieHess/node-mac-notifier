@@ -12,6 +12,7 @@ NAN_MODULE_INIT(MacNotification::Init) {
   tpl->SetClassName(Nan::New("MacNotification").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(4);
 
+  Nan::SetMethod(tpl->InstanceTemplate(), "close", Close);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("id").ToLocalChecked(), GetId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("title").ToLocalChecked(), GetTitle);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("body").ToLocalChecked(), GetBody);
@@ -83,26 +84,37 @@ void MacNotification::RegisterDelegate(Nan::Callback *activated) {
   center.delegate = delegate;
 }
 
-void MacNotification::UnregisterDelegate() {
+NAN_METHOD(MacNotification::Close) {
+  MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
+  NSString *identifier = [NSString stringWithUTF8String:**(notification->_id)];
+  
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   center.delegate = nil;
+  
+  for (NSUserNotification *notification in center.deliveredNotifications) {
+    if ([notification.identifier isEqualToString:identifier]) {
+      [center removeDeliveredNotification:notification];
+    }
+  }
+  
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(MacNotification::GetId) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
-  Nan::MaybeLocal<String> id = Nan::New<String>(**(notification->_id));
+  Nan::MaybeLocal<String> id = Nan::New(**(notification->_id));
   info.GetReturnValue().Set(id.ToLocalChecked());
 }
 
 NAN_GETTER(MacNotification::GetTitle) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
-  Nan::MaybeLocal<String> title = Nan::New<String>(**(notification->_title));
+  Nan::MaybeLocal<String> title = Nan::New(**(notification->_title));
   info.GetReturnValue().Set(title.ToLocalChecked());
 }
 
 NAN_GETTER(MacNotification::GetBody) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
-  Nan::MaybeLocal<String> title = Nan::New<String>(**(notification->_body));
+  Nan::MaybeLocal<String> title = Nan::New(**(notification->_body));
   info.GetReturnValue().Set(title.ToLocalChecked());
 }
 
