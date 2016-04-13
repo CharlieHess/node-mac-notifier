@@ -3,9 +3,9 @@ A native node module that lets you create OS X notifications from Node.js, witho
 This is useful for desktop applications built with [Electron](http://electron.atom.io/) (or something similar), as it adheres to the HTML5 [`Notification` API](https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification). Unlike the Electron [notification](https://github.com/electron/electron/blob/master/docs/tutorial/desktop-environment-integration.md#notifications-windows-linux-os-x) it also supports replies!
 
 ## Installation
-`npm install`
+`npm install node-mac-notifier`
 
-## Run Tests
+#### Run Tests
 `npm test`
 
 ## Usage
@@ -36,7 +36,7 @@ The body text. Maps to `NSUserNotification.informativeText`.
 ##### `options.icon` (string)
 A URL with image content. Maps to `NSUserNotification.contentImage`.
 ##### `options.soundName` (string)
-The name of a sound file to play once the notification is delivered. Maps to `NSUserNotification.soundName`. Set to `default` to use `NSUserNotificationDefaultSoundName`, or `null` or `undefined` for a silent notification.
+The name of a sound file to play once the notification is delivered. Maps to `NSUserNotification.soundName`. Set to `default` to use `NSUserNotificationDefaultSoundName`, or leave `undefined` for a silent notification.
 ##### `options.canReply` (bool)
 If true, this notification will have a reply action button, and can emit the `reply` event. Maps to `NSUserNotification.hasReplyButton`.
 
