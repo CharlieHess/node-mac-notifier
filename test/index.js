@@ -1,28 +1,36 @@
-var Notification = require('../');
-var assert = require('assert');
+"use strict";
 
-describe('Mac Notification', function() {
-  it('should require an options argument', function() {
-    assert.throws(function() {
-      var notification = new Notification();
+const MacNotification = require('bindings')('Notification').MacNotification
+const assert = require('assert');
+
+describe('Mac Notification', () => {
+  it('should require an options argument', () => {
+    assert.throws(() => {
+      let notification = new MacNotification();
     });
   });
   
-  it('should have a title accessor', function() {
-    var title = 'Hello OS X!';
-    var notification = new Notification({title: title});
+  it('should have an ID', () => {
+    let id = 'really-long-string-identifying-this-uniquely';
+    let notification = new MacNotification({id});
+    assert.equal(notification.id, id);
+  });
+  
+  it('should have a title', () => {
+    let title = 'Hello OS X!';
+    let notification = new MacNotification({title});
     assert.equal(notification.title, title);
   });
   
-  it('should have a body accessor', function() {
-    var body = "This is a body"
-    var notification = new Notification({body: body});
+  it('should have a body', () => {
+    let body = "This is a body"
+    let notification = new MacNotification({body});
     assert.equal(notification.body, body);
   });
   
-  it('should have a canReply accessor', function() {
-    var canReply = true;
-    var notification = new Notification({canReply: canReply});
+  it('should have a canReply field', () => {
+    let canReply = true;
+    let notification = new MacNotification({canReply});
     assert.equal(notification.canReply, canReply);
   });
 });
