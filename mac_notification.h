@@ -17,6 +17,7 @@ class MacNotification : public Nan::ObjectWrap {
       bool canReply);
     ~MacNotification();
     
+    static Nan::Utf8String* StringFromObjectOrNull(Local<Object> object, const char *key);
     static void RegisterDelegate(Nan::Callback *activated);
     static void UnregisterDelegate();
 

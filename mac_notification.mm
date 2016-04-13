@@ -32,11 +32,17 @@ MacNotification::MacNotification(Nan::Utf8String *id,
   : _id(id), _title(title), _body(body), _icon(icon), _canReply(canReply) {
 
   NSUserNotification *notification = [[NSUserNotification alloc] init];
-  notification.identifier = [NSString stringWithUTF8String:**id];
-  notification.title = [NSString stringWithUTF8String:**title];
-  notification.informativeText = [NSString stringWithUTF8String:**body];
-  NSURL *iconUrl = [NSURL URLWithString:[NSString stringWithUTF8String:**icon]];
-  notification.contentImage = [[NSImage alloc] initWithContentsOfURL:iconUrl];
+  
+  if (id != nullptr) notification.identifier = [NSString stringWithUTF8String:**id];
+  if (title != nullptr) notification.title = [NSString stringWithUTF8String:**title];
+  if (body != nullptr) notification.informativeText = [NSString stringWithUTF8String:**body];
+  
+  if (icon != nullptr) {
+    NSString *iconString = [NSString stringWithUTF8String:**icon];
+    NSURL *iconUrl = [NSURL URLWithString:iconString];
+    notification.contentImage = [[NSImage alloc] initWithContentsOfURL:iconUrl];
+  }
+  
   notification.hasReplyButton = canReply;
   
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
@@ -59,17 +65,10 @@ NAN_METHOD(MacNotification::New) {
     
     Local<Object> options = info[0].As<Object>();
     
-    MaybeLocal<Value> idHandle = Nan::Get(options, Nan::New("id").ToLocalChecked());
-    Nan::Utf8String *id = new Nan::Utf8String(idHandle.ToLocalChecked());
-
-    MaybeLocal<Value> titleHandle = Nan::Get(options, Nan::New("title").ToLocalChecked());
-    Nan::Utf8String *title = new Nan::Utf8String(titleHandle.ToLocalChecked());
-    
-    MaybeLocal<Value> bodyHandle = Nan::Get(options, Nan::New("body").ToLocalChecked());
-    Nan::Utf8String *body = new Nan::Utf8String(bodyHandle.ToLocalChecked());
-    
-    MaybeLocal<Value> iconHandle = Nan::Get(options, Nan::New("icon").ToLocalChecked());
-    Nan::Utf8String *icon = new Nan::Utf8String(iconHandle.ToLocalChecked());
+    Nan::Utf8String *id = StringFromObjectOrNull(options, "id");
+    Nan::Utf8String *title = StringFromObjectOrNull(options, "title");
+    Nan::Utf8String *body = StringFromObjectOrNull(options, "body");
+    Nan::Utf8String *icon = StringFromObjectOrNull(options, "icon");
     
     MaybeLocal<Value> canReplyHandle = Nan::Get(options, Nan::New("canReply").ToLocalChecked());
     bool canReply = Nan::To<bool>(canReplyHandle.ToLocalChecked()).FromJust();
@@ -94,6 +93,15 @@ void MacNotification::RegisterDelegate(Nan::Callback *activated) {
   NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] initWithActivationCallback:activated];
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   center.delegate = delegate;
+}
+
+Nan::Utf8String* MacNotification::StringFromObjectOrNull(Local<Object> object, const char *key) {
+  Local<String> keyHandle = Nan::New(key).ToLocalChecked();
+  Local<Value> handle = Nan::Get(object, keyHandle).ToLocalChecked();
+
+  return handle->IsUndefined() ?
+    nullptr :
+    new Nan::Utf8String(handle);
 }
 
 NAN_METHOD(MacNotification::Close) {
