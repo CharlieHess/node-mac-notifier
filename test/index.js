@@ -28,6 +28,12 @@ describe('Mac Notification', () => {
     assert.equal(notification.body, body);
   });
   
+  it('should have an icon', () => {
+    let icon = "https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2014-10-29/2900953622_045c677bdf5cc6394c35_102.jpg"
+    let notification = new MacNotification({icon});
+    assert.equal(notification.icon, icon);
+  });
+  
   it('should have a canReply field', () => {
     let canReply = true;
     let notification = new MacNotification({canReply});

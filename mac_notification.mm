@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 
 #include "mac_notification.h"
 #include "notification_center_delegate.h"
@@ -10,25 +11,32 @@ Nan::Persistent<Function> MacNotification::constructor;
 NAN_MODULE_INIT(MacNotification::Init) {
   Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
   tpl->SetClassName(Nan::New("MacNotification").ToLocalChecked());
-  tpl->InstanceTemplate()->SetInternalFieldCount(4);
+  tpl->InstanceTemplate()->SetInternalFieldCount(5);
 
   Nan::SetMethod(tpl->InstanceTemplate(), "close", Close);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("id").ToLocalChecked(), GetId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("title").ToLocalChecked(), GetTitle);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("body").ToLocalChecked(), GetBody);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("icon").ToLocalChecked(), GetIcon);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("canReply").ToLocalChecked(), GetCanReply);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("MacNotification").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
-MacNotification::MacNotification(Nan::Utf8String *id, Nan::Utf8String *title, Nan::Utf8String *body, bool canReply)
-  : _id(id), _title(title), _body(body), _canReply(canReply) {
+MacNotification::MacNotification(Nan::Utf8String *id,
+  Nan::Utf8String *title, 
+  Nan::Utf8String *body, 
+  Nan::Utf8String *icon,
+  bool canReply)
+  : _id(id), _title(title), _body(body), _icon(icon), _canReply(canReply) {
 
   NSUserNotification *notification = [[NSUserNotification alloc] init];
   notification.identifier = [NSString stringWithUTF8String:**id];
   notification.title = [NSString stringWithUTF8String:**title];
   notification.informativeText = [NSString stringWithUTF8String:**body];
+  NSURL *iconUrl = [NSURL URLWithString:[NSString stringWithUTF8String:**icon]];
+  notification.contentImage = [[NSImage alloc] initWithContentsOfURL:iconUrl];
   notification.hasReplyButton = canReply;
   
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
@@ -39,6 +47,7 @@ MacNotification::~MacNotification() {
   delete _id;
   delete _title;
   delete _body;
+  delete _icon;
 }
 
 NAN_METHOD(MacNotification::New) {
@@ -59,6 +68,9 @@ NAN_METHOD(MacNotification::New) {
     MaybeLocal<Value> bodyHandle = Nan::Get(options, Nan::New("body").ToLocalChecked());
     Nan::Utf8String *body = new Nan::Utf8String(bodyHandle.ToLocalChecked());
     
+    MaybeLocal<Value> iconHandle = Nan::Get(options, Nan::New("icon").ToLocalChecked());
+    Nan::Utf8String *icon = new Nan::Utf8String(iconHandle.ToLocalChecked());
+    
     MaybeLocal<Value> canReplyHandle = Nan::Get(options, Nan::New("canReply").ToLocalChecked());
     bool canReply = Nan::To<bool>(canReplyHandle.ToLocalChecked()).FromJust();
 
@@ -67,7 +79,7 @@ NAN_METHOD(MacNotification::New) {
 
     RegisterDelegate(activated);
     
-    MacNotification *notification = new MacNotification(id, title, body, canReply);
+    MacNotification *notification = new MacNotification(id, title, body, icon, canReply);
     notification->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   } else {
@@ -116,6 +128,12 @@ NAN_GETTER(MacNotification::GetBody) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
   Nan::MaybeLocal<String> title = Nan::New(**(notification->_body));
   info.GetReturnValue().Set(title.ToLocalChecked());
+}
+
+NAN_GETTER(MacNotification::GetIcon) {
+  MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
+  Nan::MaybeLocal<String> icon = Nan::New(**(notification->_icon));
+  info.GetReturnValue().Set(icon.ToLocalChecked());
 }
 
 NAN_GETTER(MacNotification::GetCanReply) {
