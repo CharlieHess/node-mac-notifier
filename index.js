@@ -19,9 +19,9 @@ module.exports = class Notification extends EventTarget {
 
     let activated = (isReply, response) => {
       if (isReply) {
-        this.dispatchEvent('reply', {target: this, response});
+        this.dispatchEvent({type: 'reply', response});
       } else {
-        this.dispatchEvent('click', {target: this});
+        this.dispatchEvent({type: 'click'});
       }
     };
 
