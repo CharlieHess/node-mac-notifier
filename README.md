@@ -17,8 +17,26 @@ noti.addEventListener('click', () => console.log('Got a click.'));
 In addition to the standard `click` event, these notifications also support a (non-standard) `reply` event. To enable the reply button, set `canReply` in the options argument. The user's response is included as a parameter on the event:
 ```js
 noti = new Notification('Wow, replies!', {canReply: true});
-noti.addEventListener('reply', (response) => console.log(`User entered: ${response}`));
+noti.addEventListener('reply', ({response}) => console.log(`User entered: ${response}`));
 ```
+
+## API
+### `new Notification(title, options)`
+##### `title` (string) (*required*)
+The title of the notification.
+##### `options` (Object)
+Additional parameters to the notification.
+##### `options.id` (string)
+A string identifying the notification. Maps to `NSUserNotification.identifier`. A notification with an matching a previously delivered notification will not be shown. If not provided, defaults to a RFC4122 v4 string.
+##### `options.body` (string)
+The body text. Maps to `NSUserNotification.informativeText`.
+##### `options.icon` (string)
+A URL with image content. Maps to `NSUserNotification.contentImage`.
+##### `options.canReply` (bool)
+If true, this notification will have a reply action button, and can emit the `reply` event. Maps to `NSUserNotification.hasReplyButton`.
+
+### `close()`
+Dismisses the notification immediately.
 
 ## Run Tests
 `npm test`
