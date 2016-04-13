@@ -1,7 +1,10 @@
 "use strict";
 
+const uuid = require('node-uuid');
 const EventTarget = require('event-target-shim');
 const MacNotification = require('bindings')('Notification').MacNotification
+
+let macNotification;
 
 module.exports = class Notification extends EventTarget {
 
@@ -11,6 +14,7 @@ module.exports = class Notification extends EventTarget {
     if (!title) throw new Error('Title is required');
     
     options = options || {};
+    options.id = options.id || uuid.v4();
     options.body = options.body || '';
     
     Object.assign(this, {title}, options);
@@ -26,12 +30,13 @@ module.exports = class Notification extends EventTarget {
     };
 
     let args = Object.assign({title, activated}, options);
-    this.notification = new MacNotification(args);
+    macNotification = new MacNotification(args);
   }
 
   close() {
-    this.notification.close();
-    this.notification = null;
+    macNotification.close();
+    macNotification = null;
+    
     this.dispatchEvent({type: 'close'});
   }
 };
