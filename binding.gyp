@@ -4,7 +4,8 @@
     "sources": [
       "Notification.cc",
       "mac_notification.mm",
-      "notification_center_delegate.mm"
+      "notification_center_delegate.mm",
+      "bundle_id_override.mm"
     ],
     "include_dirs": [
       "<!(node -e \"require('nan')\")"

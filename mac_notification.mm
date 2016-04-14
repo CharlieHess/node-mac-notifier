@@ -3,6 +3,7 @@
 
 #include "mac_notification.h"
 #include "notification_center_delegate.h"
+#include "bundle_id_override.h"
 
 using namespace v8;
 
@@ -20,6 +21,7 @@ NAN_MODULE_INIT(MacNotification::Init) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("icon").ToLocalChecked(), GetIcon);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("soundName").ToLocalChecked(), GetSoundName);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("canReply").ToLocalChecked(), GetCanReply);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("bundleId").ToLocalChecked(), GetBundleId);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("MacNotification").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -83,10 +85,7 @@ NAN_METHOD(MacNotification::New) {
     MaybeLocal<Value> canReplyHandle = Nan::Get(options, Nan::New("canReply").ToLocalChecked());
     bool canReply = Nan::To<bool>(canReplyHandle.ToLocalChecked()).FromJust();
 
-    MaybeLocal<Value> activatedHandle = Nan::Get(options, Nan::New("activated").ToLocalChecked());
-    Nan::Callback *activated = new Nan::Callback(activatedHandle.ToLocalChecked().As<Function>());
-
-    RegisterDelegate(activated);
+    RegisterDelegateFromOptions(options);
     
     MacNotification *notification = new MacNotification(id, title, body, icon, soundName, canReply);
     notification->Wrap(info.This());
@@ -99,7 +98,15 @@ NAN_METHOD(MacNotification::New) {
   }
 }
 
-void MacNotification::RegisterDelegate(Nan::Callback *activated) {
+void MacNotification::RegisterDelegateFromOptions(Local<Object> options) {
+  MaybeLocal<Value> activatedHandle = Nan::Get(options, Nan::New("activated").ToLocalChecked());
+  Nan::Callback *activated = new Nan::Callback(activatedHandle.ToLocalChecked().As<Function>());
+  
+  Nan::Utf8String *bundleId = StringFromObjectOrNull(options, "bundleId");
+  if (bundleId != nullptr) {
+    [[BundleIdentifierOverride alloc] initWithBundleId:[NSString stringWithUTF8String:**bundleId]];
+  }
+  
   NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] initWithActivationCallback:activated];
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   center.delegate = delegate;
@@ -163,4 +170,10 @@ NAN_GETTER(MacNotification::GetSoundName) {
 NAN_GETTER(MacNotification::GetCanReply) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
   info.GetReturnValue().Set(notification->_canReply);
+}
+
+NAN_GETTER(MacNotification::GetBundleId) {
+  NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
+  Nan::MaybeLocal<String> bundleString = Nan::New(bundleId.UTF8String);
+  info.GetReturnValue().Set(bundleString.ToLocalChecked());
 }
