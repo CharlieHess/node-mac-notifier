@@ -45,10 +45,16 @@ describe('Mac Notification', () => {
     let notification = new MacNotification({canReply});
     assert.equal(notification.canReply, canReply);
   });
-  
+
   it('should have a close method', () => {
     let notification = new MacNotification({id: 'toClose'});
     notification.close();
     assert.ok(notification);
+  });
+  
+  it('should allow overriding the NSBundle ID', () => {
+    let bundleId = 'com.lol.what.bundle';
+    let notification = new MacNotification({bundleId});
+    assert.equal(notification.bundleId, bundleId);
   });
 });
