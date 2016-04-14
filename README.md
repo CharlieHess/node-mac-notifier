@@ -1,6 +1,8 @@
 # node-mac-notifier
 A native node module that lets you create OS X notifications from Node.js, without spawning a separate process.
-This is useful for desktop applications built with [Electron](http://electron.atom.io/) (or something similar), as it adheres to the HTML5 [`Notification` API](https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification). Unlike the Electron [notification](https://github.com/electron/electron/blob/master/docs/tutorial/desktop-environment-integration.md#notifications-windows-linux-os-x) it also supports replies!
+This is useful for desktop applications built with [Electron](http://electron.atom.io/) (or something similar), as it adheres to the HTML5 [`Notification` API](https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification). Unlike the Electron [notification](https://github.com/electron/electron/blob/master/docs/tutorial/desktop-environment-integration.md#notifications-windows-linux-os-x) it also supports replies:
+
+![](https://s3.amazonaws.com/f.cl.ly/items/2Q3E1S0o440S043y2k1K/Image%202016-04-14%20at%202.37.47%20PM.png?v=d0388e46)
 
 ## Installation
 `npm install node-mac-notifier`
