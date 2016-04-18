@@ -12,6 +12,7 @@
     "type": "git",
     "url": "https://github.com/CharlieHess/node-mac-notifier"
   },
+  "os": ["darwin"],
   "author": "Charlie Hess",
   "devDependencies": {
     "nan": "^2.0.5",
