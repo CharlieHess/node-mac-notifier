@@ -11,8 +11,8 @@ This is useful for desktop applications built with [Electron](http://electron.at
 `npm test`
 
 ## Usage
-Ensure that this module is called from a renderer process; it will have no effect in the main process.
- 
+Ensure that this module is called from a renderer process; it will have no effect in the main process. Works with Electron >=0.37.7.
+
 ```js
 Notification = require('node-mac-notifier');
 noti = new Notification('Hello from OS X', {body: 'It Works!'});
@@ -36,7 +36,7 @@ A string identifying the notification. Maps to `NSUserNotification.identifier`. 
 ##### `options.body` (string)
 The body text. Maps to `NSUserNotification.informativeText`.
 ##### `options.icon` (string)
-A URL with image content. Maps to `NSUserNotification.contentImage`.
+A URL with image content. Maps to `NSUserNotification.contentImage`. Should be an absolute URL. 
 ##### `options.soundName` (string)
 The name of a sound file to play once the notification is delivered. Maps to `NSUserNotification.soundName`. Set to `default` to use `NSUserNotificationDefaultSoundName`, or leave `undefined` for a silent notification.
 ##### `options.canReply` (bool)
