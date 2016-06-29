@@ -13,6 +13,11 @@
     "url": "https://github.com/CharlieHess/node-mac-notifier"
   },
   "os": ["darwin"],
+  "keywords": [
+    "notifier",
+    "notifications",
+    "electron"
+  ],
   "author": "Charlie Hess",
   "devDependencies": {
     "nan": "^2.0.5",

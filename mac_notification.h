@@ -17,8 +17,9 @@ class MacNotification : public Nan::ObjectWrap {
       Nan::Utf8String *soundName,
       bool canReply);
     ~MacNotification();
-    
+
     static Nan::Utf8String* StringFromObjectOrNull(Local<Object> object, const char *key);
+    static void SetStringOrUndefined(Nan::ReturnValue<Value> ret, Nan::Utf8String *prop);
     static void RegisterDelegateFromOptions(Local<Object> options);
 
     static NAN_METHOD(New);
@@ -30,7 +31,7 @@ class MacNotification : public Nan::ObjectWrap {
     static NAN_GETTER(GetSoundName);
     static NAN_GETTER(GetCanReply);
     static NAN_GETTER(GetBundleId);
-    
+
     static Nan::Persistent<Function> constructor;
 
     Nan::Utf8String *_id, *_title, *_body, *_icon, *_soundName;
