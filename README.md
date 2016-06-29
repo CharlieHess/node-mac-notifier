@@ -35,8 +35,10 @@ Additional parameters to the notification.
 A string identifying the notification. Maps to `NSUserNotification.identifier`. A notification with an `id` matching a previously delivered notification will not be shown. If not provided, defaults to a RFC4122 v4 string.
 ##### `options.body` (string)
 The body text. Maps to `NSUserNotification.informativeText`.
+##### `options.subtitle` (string)
+The subtitle text. Maps to `NSUserNotification.subtitle`.
 ##### `options.icon` (string)
-A URL with image content. Maps to `NSUserNotification.contentImage`. Should be an absolute URL. 
+A URL with image content. Maps to `NSUserNotification.contentImage`. Should be an absolute URL.
 ##### `options.soundName` (string)
 The name of a sound file to play once the notification is delivered. Maps to `NSUserNotification.soundName`. Set to `default` to use `NSUserNotificationDefaultSoundName`, or leave `undefined` for a silent notification.
 ##### `options.canReply` (bool)

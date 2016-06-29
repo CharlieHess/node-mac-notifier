@@ -12,6 +12,7 @@ class MacNotification : public Nan::ObjectWrap {
   private:
     explicit MacNotification(Nan::Utf8String *id,
       Nan::Utf8String *title,
+      Nan::Utf8String *subtitle,
       Nan::Utf8String *body,
       Nan::Utf8String *icon,
       Nan::Utf8String *soundName,
@@ -26,6 +27,7 @@ class MacNotification : public Nan::ObjectWrap {
     static NAN_METHOD(Close);
     static NAN_GETTER(GetId);
     static NAN_GETTER(GetTitle);
+    static NAN_GETTER(GetSubtitle);
     static NAN_GETTER(GetBody);
     static NAN_GETTER(GetIcon);
     static NAN_GETTER(GetSoundName);
@@ -34,7 +36,7 @@ class MacNotification : public Nan::ObjectWrap {
 
     static Nan::Persistent<Function> constructor;
 
-    Nan::Utf8String *_id, *_title, *_body, *_icon, *_soundName;
+    Nan::Utf8String *_id, *_title, *_subtitle, *_body, *_icon, *_soundName;
     bool _canReply;
 };
 

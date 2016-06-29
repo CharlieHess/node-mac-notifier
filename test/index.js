@@ -30,6 +30,12 @@ describe('Mac Notification', () => {
     assert.equal(notification.title, title);
   });
 
+  it('should have a subtitle field', () => {
+    let subtitle = 'subtitular field';
+    let notification = new MacNotification({subtitle});
+    assert.equal(notification.subtitle, subtitle);
+  });
+
   it('should have a body field', () => {
     let body = "This is a body"
     let notification = new MacNotification({body});
