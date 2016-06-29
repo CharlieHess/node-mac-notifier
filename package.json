@@ -1,6 +1,6 @@
 {
   "name": "node-mac-notifier",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Create native OS X notifications from Node.js",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,9 @@
     "type": "git",
     "url": "https://github.com/CharlieHess/node-mac-notifier"
   },
-  "os": ["darwin"],
+  "os": [
+    "darwin"
+  ],
   "keywords": [
     "notifier",
     "notifications",
@@ -20,9 +22,9 @@
   ],
   "author": "Charlie Hess",
   "devDependencies": {
-    "nan": "^2.0.5",
     "mocha": "^2.2.5",
-    "node-gyp": "^1.0.3"
+    "nan": "^2.3.5",
+    "node-gyp": "^3.4.0"
   },
   "dependencies": {
     "bindings": "^1.2.1",
