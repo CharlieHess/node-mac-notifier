@@ -47,11 +47,9 @@ static void AsyncSendHandler(uv_async_t *handle) {
   Info.callback = OnActivation;
 
   if (Info.isReply) {
-    const char *utf8String = notification.response.string.UTF8String;
-    Info.response = new char[strlen(utf8String) + 1];
-    std::strcpy(Info.response, utf8String);
+    Info.response = strdup(notification.response.string.UTF8String);
   } else {
-    Info.response = (char*)"";
+    Info.response = "";
   }
 
   // Stash a pointer to the activation information and push it onto the libuv

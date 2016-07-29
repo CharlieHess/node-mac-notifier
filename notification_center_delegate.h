@@ -6,7 +6,7 @@
 struct NotificationActivationInfo {
   Nan::Callback *callback;
   bool isReply;
-  char *response;
+  const char *response;
 };
 
 @interface NotificationCenterDelegate : NSObject<NSUserNotificationCenterDelegate> {
