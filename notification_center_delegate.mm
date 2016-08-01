@@ -19,7 +19,6 @@ static void AsyncSendHandler(uv_async_t *handle) {
   };
 
   info->callback->Call(2, argv);
-  delete info->response;
 }
 
 /**
