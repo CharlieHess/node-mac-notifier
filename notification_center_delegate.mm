@@ -13,10 +13,12 @@ static void AsyncSendHandler(uv_async_t *handle) {
   Nan::HandleScope scope;
   NotificationActivationInfo *info = static_cast<NotificationActivationInfo *>(handle->data);
 
+  NSLog(@"Invoked notification with id: %s", info->id);
+
   v8::Local<v8::Value> argv[3] = {
     Nan::New(info->isReply),
     Nan::New(info->response).ToLocalChecked(),
-    Nan::New(info->id).ToLocalChecked()
+    Nan::New<v8::String>(info->id).ToLocalChecked()
   };
 
   info->callback->Call(3, argv);
