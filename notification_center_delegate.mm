@@ -18,7 +18,7 @@ static void AsyncSendHandler(uv_async_t *handle) {
   v8::Local<v8::Value> argv[3] = {
     Nan::New(info->isReply),
     Nan::New(info->response).ToLocalChecked(),
-    Nan::New<v8::String>(info->id).ToLocalChecked()
+    Nan::New(info->id).ToLocalChecked()
   };
 
   info->callback->Call(3, argv);
@@ -46,7 +46,7 @@ static void AsyncSendHandler(uv_async_t *handle) {
        didActivateNotification:(NSUserNotification *)notification
 {
   Info.isReply = notification.activationType == NSUserNotificationActivationTypeReplied;
-  Info.id = [notification.identifier cStringUsingEncoding:NSASCIIStringEncoding];
+  Info.id = strdup(notification.identifier.UTF8String);
   Info.callback = OnActivation;
 
   if (Info.isReply) {
