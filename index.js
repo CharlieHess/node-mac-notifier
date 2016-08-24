@@ -21,8 +21,6 @@ module.exports = class Notification extends EventTarget {
     let activated = (isReply, response, id) => {
       const notification = this.getNotificationById(id);
       if (!notification) return;
-
-      console.log(notifications);
       
       if (isReply) {
         notification.dispatchEvent({type: 'reply', response});
