@@ -3,9 +3,9 @@
 const uuid = require('node-uuid');
 const EventTarget = require('event-target-shim');
 const MacNotification = require('bindings')('Notification').MacNotification
+const notifications = [];
 
 module.exports = class Notification extends EventTarget {
-
   constructor(title, options) {
     super();
     
@@ -18,22 +18,36 @@ module.exports = class Notification extends EventTarget {
     options.body = options.body || '';
     options.canReply = !!options.canReply;
 
-    let activated = (isReply, response) => {
+    let activated = (isReply, response, id) => {
+      const notification = this.getNotificationById(id) || this;
+      
       if (isReply) {
-        this.dispatchEvent({type: 'reply', response});
+        notification.dispatchEvent({type: 'reply', response});
       } else {
-        this.dispatchEvent({type: 'click'});
+        notification.dispatchEvent({type: 'click'});
       }
     };
 
     let args = Object.assign({title, activated}, options);
     this.notification = new MacNotification(args);
+    notifications.push(this);
   }
 
   close() {
+    let i = getNotificationIndexById(this.notification.id);
+    if (i) notifications.splice(i, 1);
+
     this.notification.close();
     this.notification = null;
     
     this.dispatchEvent({type: 'close'});
+  }
+
+  getNotificationById(id) {
+    return notifications.find((item) => (item.notification.id === id));
+  }
+
+  getNotificationIndexById(id) {
+    return notifications.findIndex((item) => (item.notification.id === id));
   }
 };
