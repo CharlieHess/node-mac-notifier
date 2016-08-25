@@ -35,22 +35,30 @@ module.exports = class Notification extends EventTarget {
   }
 
   close() {
-    if (notifications && notifications.length > 0) {
-      let i = this.getNotificationIndexById(this.notification.id);
-      if (i) notifications.splice(i, 1);
-    }
-
     this.notification.close();
     this.notification = null;
     
     this.dispatchEvent({type: 'close'});
+
+    if (this.notification && notifications && notifications.length > 0) {
+      let i = this.getNotificationIndexById(this.notification.id);
+      if (i) notifications.splice(i, 1);
+    }
   }
 
   getNotificationById(id) {
-    return notifications.find((item) => (item.notification.id === id));
+    return notifications.find((item) => this.compareItemWithId(item, id));
   }
 
   getNotificationIndexById(id) {
-    return notifications.findIndex((item) => (item.notification.id === id));
+    return notifications.findIndex((item) => this.compareItemWithId(item, id));
+  }
+
+  compareItemWithId(item, id) {
+    if (item && item.notification && item.notification.id) {
+      return item.notification.id === id;
+    } else {
+      return false;
+    }
   }
 };
