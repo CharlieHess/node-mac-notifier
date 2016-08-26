@@ -13,12 +13,15 @@ static void AsyncSendHandler(uv_async_t *handle) {
   Nan::HandleScope scope;
   NotificationActivationInfo *info = static_cast<NotificationActivationInfo *>(handle->data);
 
-  v8::Local<v8::Value> argv[2] = {
+  NSLog(@"Invoked notification with id: %s", info->id);
+
+  v8::Local<v8::Value> argv[3] = {
     Nan::New(info->isReply),
-    Nan::New(info->response).ToLocalChecked()
+    Nan::New(info->response).ToLocalChecked(),
+    Nan::New(info->id).ToLocalChecked()
   };
 
-  info->callback->Call(2, argv);
+  info->callback->Call(3, argv);
 }
 
 /**
@@ -43,6 +46,7 @@ static void AsyncSendHandler(uv_async_t *handle) {
        didActivateNotification:(NSUserNotification *)notification
 {
   Info.isReply = notification.activationType == NSUserNotificationActivationTypeReplied;
+  Info.id = strdup(notification.identifier.UTF8String);
   Info.callback = OnActivation;
 
   if (Info.isReply) {

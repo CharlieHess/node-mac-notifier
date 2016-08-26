@@ -109,7 +109,6 @@ NAN_METHOD(MacNotification::Close) {
   NSString *identifier = [NSString stringWithUTF8String:**(notification->_id)];
 
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
-  center.delegate = nil;
 
   for (NSUserNotification *notification in center.deliveredNotifications) {
     if ([notification.identifier isEqualToString:identifier]) {
