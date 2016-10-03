@@ -37,15 +37,15 @@ module.exports = class Notification extends EventTarget {
   close() {
     if (!this.notification) return;
 
-    this.notification.close();
-    this.notification = null;
-
-    this.dispatchEvent({type: 'close'});
-
     if (notifications && notifications.length > 0) {
       let i = this.getNotificationIndexById(this.notification.id);
       if (i) notifications.splice(i, 1);
     }
+
+    this.notification.close();
+    this.notification = null;
+
+    this.dispatchEvent({type: 'close'});
   }
 
   getNotificationById(id) {
