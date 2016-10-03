@@ -8,11 +8,11 @@ const notifications = [];
 module.exports = class Notification extends EventTarget {
   constructor(title, options) {
     super();
-    
+
     if (!title) throw new Error('Title is required');
-    
+
     Object.assign(this, {title}, options);
-    
+
     options = options || {};
     options.id = options.id || uuid.v4();
     options.body = options.body || '';
@@ -21,7 +21,7 @@ module.exports = class Notification extends EventTarget {
     let activated = (isReply, response, id) => {
       const notification = this.getNotificationById(id);
       if (!notification) return;
-      
+
       if (isReply) {
         notification.dispatchEvent({type: 'reply', response});
       } else {
@@ -35,12 +35,14 @@ module.exports = class Notification extends EventTarget {
   }
 
   close() {
+    if (!this.notification) return;
+
     this.notification.close();
     this.notification = null;
-    
+
     this.dispatchEvent({type: 'close'});
 
-    if (this.notification && notifications && notifications.length > 0) {
+    if (notifications && notifications.length > 0) {
       let i = this.getNotificationIndexById(this.notification.id);
       if (i) notifications.splice(i, 1);
     }
