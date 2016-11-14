@@ -17,6 +17,7 @@ module.exports = class Notification extends EventTarget {
     options.id = options.id || uuid.v4();
     options.body = options.body || '';
     options.canReply = !!options.canReply;
+    options.showCloseButton = !!options.showCloseButton;
 
     let activated = (isReply, response, id) => {
       const notification = this.getNotificationById(id);

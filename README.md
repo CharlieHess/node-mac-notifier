@@ -43,6 +43,8 @@ A URL with image content. Maps to `NSUserNotification.contentImage`. Should be a
 The name of a sound file to play once the notification is delivered. Maps to `NSUserNotification.soundName`. Set to `default` to use `NSUserNotificationDefaultSoundName`, or leave `undefined` for a silent notification.
 ##### `options.canReply` (bool)
 If true, this notification will have a reply action button, and can emit the `reply` event. Maps to `NSUserNotification.hasReplyButton`.
+##### `options.showCloseButton` (bool)
+If true, this notification will have a close button on hover. If `canReply` is true, it'll show "Close" and "Reply", otherwise it will show a "Close" and "Show" button. 
 ##### `options.bundleId` (string)
 Set this to override the `NSBundle.bundleIdentifier` used for the notification. This is a brute force way for your notifications to take on the appropriate app icon.
 

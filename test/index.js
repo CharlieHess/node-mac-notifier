@@ -60,6 +60,12 @@ describe('Mac Notification', () => {
     assert.equal(notification.canReply, canReply);
   });
 
+  it('should have a showCloseButton field', () => {
+    let showCloseButton = true;
+    let notification = new MacNotification({showCloseButton});
+    assert.equal(notification.showCloseButton, showCloseButton);
+  });
+
   it('should have a close method', () => {
     let notification = new MacNotification({id: 'toClose'});
     notification.close();

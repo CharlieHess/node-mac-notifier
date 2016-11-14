@@ -12,7 +12,7 @@ Nan::Persistent<Function> MacNotification::constructor;
 NAN_MODULE_INIT(MacNotification::Init) {
   Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
   tpl->SetClassName(Nan::New("MacNotification").ToLocalChecked());
-  tpl->InstanceTemplate()->SetInternalFieldCount(8);
+  tpl->InstanceTemplate()->SetInternalFieldCount(9);
 
   Nan::SetMethod(tpl->InstanceTemplate(), "close", Close);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("id").ToLocalChecked(), GetId);
@@ -22,6 +22,7 @@ NAN_MODULE_INIT(MacNotification::Init) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("icon").ToLocalChecked(), GetIcon);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("soundName").ToLocalChecked(), GetSoundName);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("canReply").ToLocalChecked(), GetCanReply);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("showCloseButton").ToLocalChecked(), GetShowCloseButton);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("bundleId").ToLocalChecked(), GetBundleId);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -34,8 +35,9 @@ MacNotification::MacNotification(Nan::Utf8String *id,
   Nan::Utf8String *body,
   Nan::Utf8String *icon,
   Nan::Utf8String *soundName,
-  bool canReply)
-  : _id(id), _title(title), _subtitle(subtitle), _body(body), _icon(icon), _soundName(soundName), _canReply(canReply) {
+  bool canReply,
+  bool showCloseButton)
+  : _id(id), _title(title), _subtitle(subtitle), _body(body), _icon(icon), _soundName(soundName), _canReply(canReply), _showCloseButton(showCloseButton) {
 
   NSUserNotification *notification = [[NSUserNotification alloc] init];
 
@@ -58,6 +60,12 @@ MacNotification::MacNotification(Nan::Utf8String *id,
   }
 
   notification.hasReplyButton = canReply;
+
+  // Show close button on hover, even in banner style notification. Thanks http://stackoverflow.com/a/23087567/1397311
+  if(showCloseButton) {
+    notification.otherButtonTitle = @"Close";
+    [notification setValue:@YES forKey:@"_showsButtons"];
+  }
 
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   [center deliverNotification:notification];
@@ -91,9 +99,12 @@ NAN_METHOD(MacNotification::New) {
     MaybeLocal<Value> canReplyHandle = Nan::Get(options, Nan::New("canReply").ToLocalChecked());
     bool canReply = Nan::To<bool>(canReplyHandle.ToLocalChecked()).FromJust();
 
+    MaybeLocal<Value> showCloseButtonHandle = Nan::Get(options, Nan::New("showCloseButton").ToLocalChecked());
+    bool showCloseButton = Nan::To<bool>(showCloseButtonHandle.ToLocalChecked()).FromJust();
+
     RegisterDelegateFromOptions(options);
 
-    MacNotification *notification = new MacNotification(id, title, subtitle, body, icon, soundName, canReply);
+    MacNotification *notification = new MacNotification(id, title, subtitle, body, icon, soundName, canReply, showCloseButton);
     notification->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   } else {
@@ -152,6 +163,11 @@ NAN_GETTER(MacNotification::GetSoundName) {
 NAN_GETTER(MacNotification::GetCanReply) {
   MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
   info.GetReturnValue().Set(notification->_canReply);
+}
+
+NAN_GETTER(MacNotification::GetShowCloseButton) {
+  MacNotification* notification = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
+  info.GetReturnValue().Set(notification->_showCloseButton);
 }
 
 NAN_GETTER(MacNotification::GetBundleId) {
