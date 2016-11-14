@@ -16,7 +16,8 @@ class MacNotification : public Nan::ObjectWrap {
       Nan::Utf8String *body,
       Nan::Utf8String *icon,
       Nan::Utf8String *soundName,
-      bool canReply);
+      bool canReply,
+      bool showCloseButton);
     ~MacNotification();
 
     static Nan::Utf8String* StringFromObjectOrNull(Local<Object> object, const char *key);
@@ -32,12 +33,14 @@ class MacNotification : public Nan::ObjectWrap {
     static NAN_GETTER(GetIcon);
     static NAN_GETTER(GetSoundName);
     static NAN_GETTER(GetCanReply);
+    static NAN_GETTER(GetShowCloseButton);
     static NAN_GETTER(GetBundleId);
 
     static Nan::Persistent<Function> constructor;
 
     Nan::Utf8String *_id, *_title, *_subtitle, *_body, *_icon, *_soundName;
     bool _canReply;
+    bool _showCloseButton;
 };
 
 #endif
