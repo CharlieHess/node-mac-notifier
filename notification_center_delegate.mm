@@ -2,8 +2,9 @@
 
 @implementation NotificationCenterDelegate
 
-uv_loop_t *defaultLoop = uv_default_loop();
-uv_async_t async;
+static void DeleteAsyncHandle(uv_handle_t *handle) {
+  delete (uv_async_t *)handle;
+}
 
 /**
  * This handler runs in the V8 context as a result of `uv_async_send`. Here we
@@ -22,6 +23,9 @@ static void AsyncSendHandler(uv_async_t *handle) {
   };
 
   info->callback->Call(3, argv);
+
+  uv_close((uv_handle_t *)handle, DeleteAsyncHandle);
+  handle = nullptr;
 }
 
 /**
@@ -32,8 +36,6 @@ static void AsyncSendHandler(uv_async_t *handle) {
 {
   if (self = [super init]) {
     OnActivation = onActivation;
-
-    uv_async_init(defaultLoop, &async, (uv_async_cb)AsyncSendHandler);
   }
 
   return self;
@@ -55,11 +57,14 @@ static void AsyncSendHandler(uv_async_t *handle) {
     Info.response = "";
   }
 
+  auto *async = new uv_async_t();
+  uv_async_init(uv_default_loop(), async, (uv_async_cb)AsyncSendHandler);
+
   // Stash a pointer to the activation information and push it onto the libuv
   // event loop. Note that the info must be class-local otherwise it'll be
   // garbage collected before the event is handled.
-  async.data = &Info;
-  uv_async_send(&async);
+  async->data = &Info;
+  uv_async_send(async);
 }
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
