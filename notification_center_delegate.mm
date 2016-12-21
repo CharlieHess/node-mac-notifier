@@ -1,5 +1,14 @@
 #include "notification_center_delegate.h"
 
+#include <string>
+
+struct NotificationActivationInfo {
+  Nan::Callback *callback;
+  bool isReply;
+  std::string response;
+  std::string id;
+};
+
 @implementation NotificationCenterDelegate
 
 static void DeleteAsyncHandle(uv_handle_t *handle) {
@@ -12,7 +21,8 @@ static void DeleteAsyncHandle(uv_handle_t *handle) {
  */
 static void AsyncSendHandler(uv_async_t *handle) {
   Nan::HandleScope scope;
-  NotificationActivationInfo *info = static_cast<NotificationActivationInfo *>(handle->data);
+
+  auto *info = static_cast<NotificationActivationInfo *>(handle->data);
 
   NSLog(@"Invoked notification with id: %s", info->id.c_str());
 
@@ -24,8 +34,11 @@ static void AsyncSendHandler(uv_async_t *handle) {
 
   info->callback->Call(3, argv);
 
+  delete info;
+  info = nullptr;
+  handle->data = nullptr;
+
   uv_close((uv_handle_t *)handle, DeleteAsyncHandle);
-  handle = nullptr;
 }
 
 /**
@@ -47,23 +60,18 @@ static void AsyncSendHandler(uv_async_t *handle) {
 - (void)userNotificationCenter:(NSUserNotificationCenter *)center
        didActivateNotification:(NSUserNotification *)notification
 {
-  Info.isReply = notification.activationType == NSUserNotificationActivationTypeReplied;
-  Info.id = notification.identifier.UTF8String;
-  Info.callback = OnActivation;
+  auto *info = new NotificationActivationInfo();
+  info->isReply = notification.activationType == NSUserNotificationActivationTypeReplied;
+  info->id = notification.identifier.UTF8String;
+  info->callback = OnActivation;
 
-  if (Info.isReply) {
-    Info.response = notification.response.string.UTF8String;
-  } else {
-    Info.response = "";
+  if (info->isReply) {
+    info->response = notification.response.string.UTF8String;
   }
 
   auto *async = new uv_async_t();
+  async->data = info;
   uv_async_init(uv_default_loop(), async, (uv_async_cb)AsyncSendHandler);
-
-  // Stash a pointer to the activation information and push it onto the libuv
-  // event loop. Note that the info must be class-local otherwise it'll be
-  // garbage collected before the event is handled.
-  async->data = &Info;
   uv_async_send(async);
 }
 
