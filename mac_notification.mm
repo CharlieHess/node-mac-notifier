@@ -156,8 +156,12 @@ NAN_GETTER(MacNotification::GetCanReply) {
 
 NAN_GETTER(MacNotification::GetBundleId) {
   NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
-  Nan::MaybeLocal<String> bundleString = Nan::New(bundleId.UTF8String);
-  info.GetReturnValue().Set(bundleString.ToLocalChecked());
+  if (bundleId) {
+    Nan::MaybeLocal<String> bundleString = Nan::New(bundleId.UTF8String);
+    info.GetReturnValue().Set(bundleString.ToLocalChecked());
+  } else {
+    info.GetReturnValue().Set(Nan::Null());
+  }
 }
 
 void MacNotification::RegisterDelegateFromOptions(Local<Object> options) {
