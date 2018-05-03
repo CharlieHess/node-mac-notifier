@@ -1,6 +1,6 @@
 {
   "name": "node-mac-notifier",
-  "version": "0.0.14",
+  "version": "0.1.1",
   "description": "Create native OS X notifications from Node.js",
   "main": "index.js",
   "scripts": {
