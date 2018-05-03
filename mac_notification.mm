@@ -22,6 +22,7 @@ NAN_MODULE_INIT(MacNotification::Init) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("icon").ToLocalChecked(), GetIcon);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("soundName").ToLocalChecked(), GetSoundName);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("canReply").ToLocalChecked(), GetCanReply);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("otherButtonTitle").ToLocalChecked(), GetOtherButtonTitle);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("bundleId").ToLocalChecked(), GetBundleId);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -34,8 +35,9 @@ MacNotification::MacNotification(Nan::Utf8String *id,
   Nan::Utf8String *body,
   Nan::Utf8String *icon,
   Nan::Utf8String *soundName,
-  bool canReply)
-  : _id(id), _title(title), _subtitle(subtitle), _body(body), _icon(icon), _soundName(soundName), _canReply(canReply) {
+  bool canReply,
+  Nan::Utf8String *otherButtonTitle)
+  : _id(id), _title(title), _subtitle(subtitle), _body(body), _icon(icon), _soundName(soundName), _canReply(canReply), _otherButtonTitle(otherButtonTitle) {
 
   NSUserNotification *notification = [[NSUserNotification alloc] init];
 
@@ -43,6 +45,7 @@ MacNotification::MacNotification(Nan::Utf8String *id,
   if (title != nullptr) notification.title = [NSString stringWithUTF8String:**title];
   if (subtitle != nullptr) notification.subtitle = [NSString stringWithUTF8String:**subtitle];
   if (body != nullptr) notification.informativeText = [NSString stringWithUTF8String:**body];
+  if (otherButtonTitle != nullptr) notification.otherButtonTitle = [NSString stringWithUTF8String:**otherButtonTitle];
 
   if (icon != nullptr) {
     NSString *iconString = [NSString stringWithUTF8String:**icon];
@@ -87,13 +90,14 @@ NAN_METHOD(MacNotification::New) {
     Nan::Utf8String *body = StringFromObjectOrNull(options, "body");
     Nan::Utf8String *icon = StringFromObjectOrNull(options, "icon");
     Nan::Utf8String *soundName = StringFromObjectOrNull(options, "soundName");
+    Nan::Utf8String *otherButtonTitle = StringFromObjectOrNull(options, "otherButtonTitle");
 
     MaybeLocal<Value> canReplyHandle = Nan::Get(options, Nan::New("canReply").ToLocalChecked());
     bool canReply = Nan::To<bool>(canReplyHandle.ToLocalChecked()).FromJust();
 
     RegisterDelegateFromOptions(options);
 
-    MacNotification *notification = new MacNotification(id, title, subtitle, body, icon, soundName, canReply);
+    MacNotification *notification = new MacNotification(id, title, subtitle, body, icon, soundName, canReply, otherButtonTitle);
     notification->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   } else {
@@ -154,10 +158,19 @@ NAN_GETTER(MacNotification::GetCanReply) {
   info.GetReturnValue().Set(notification->_canReply);
 }
 
+NAN_GETTER(MacNotification::GetOtherButtonTitle) {
+  auto noti = Nan::ObjectWrap::Unwrap<MacNotification>(info.This());
+  SetStringOrUndefined(info.GetReturnValue(), noti->_otherButtonTitle);
+}
+
 NAN_GETTER(MacNotification::GetBundleId) {
   NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
-  Nan::MaybeLocal<String> bundleString = Nan::New(bundleId.UTF8String);
-  info.GetReturnValue().Set(bundleString.ToLocalChecked());
+  if (bundleId) {
+    Nan::MaybeLocal<String> bundleString = Nan::New(bundleId.UTF8String);
+    info.GetReturnValue().Set(bundleString.ToLocalChecked());
+  } else {
+    info.GetReturnValue().Set(Nan::Null());
+  }
 }
 
 void MacNotification::RegisterDelegateFromOptions(Local<Object> options) {
