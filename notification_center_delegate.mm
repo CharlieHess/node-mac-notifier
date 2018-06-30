@@ -21,7 +21,7 @@ static void AsyncSendHandler(uv_async_t *handle) {
     Nan::New(info->id).ToLocalChecked()
   };
 
-  info->callback->Call(3, argv);
+  Nan::Call(*(info->callback), 3, argv);
 }
 
 /**
