@@ -1,6 +1,6 @@
 "use strict";
 
-const uuid = require('node-uuid');
+const uuidv4 = require('uuid/v4');
 const EventTarget = require('event-target-shim');
 const MacNotification = require('bindings')('Notification').MacNotification
 const notifications = [];
@@ -14,7 +14,7 @@ module.exports = class Notification extends EventTarget {
     Object.assign(this, {title}, options);
 
     options = options || {};
-    options.id = options.id || uuid.v4();
+    options.id = options.id || uuidv4();
     options.body = options.body || '';
     options.canReply = !!options.canReply;
 

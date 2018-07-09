@@ -1,6 +1,6 @@
 {
   "name": "node-mac-notifier",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create native OS X notifications from Node.js",
   "main": "index.js",
   "scripts": {
@@ -29,6 +29,6 @@
   "dependencies": {
     "bindings": "^1.2.1",
     "event-target-shim": "^1.1.1",
-    "node-uuid": "^1.4.7"
+    "uuid": "^3.2.1"
   }
 }
