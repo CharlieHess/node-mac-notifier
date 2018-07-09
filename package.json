@@ -1,6 +1,6 @@
 {
   "name": "node-mac-notifier",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create macOS system notifications from Node.js",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,7 @@
   "devDependencies": {
     "mocha": "^2.2.5",
     "nan": "^2.10.0",
-    "node-gyp": "^3.4.0"
+    "node-gyp": "^3.7.0"
   },
   "dependencies": {
     "bindings": "^1.2.1",
