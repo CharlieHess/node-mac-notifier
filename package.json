@@ -1,7 +1,7 @@
 {
   "name": "node-mac-notifier",
-  "version": "0.1.0",
-  "description": "Create native OS X notifications from Node.js",
+  "version": "1.0.0",
+  "description": "Create macOS system notifications from Node.js",
   "main": "index.js",
   "scripts": {
     "install": "node-gyp rebuild",
