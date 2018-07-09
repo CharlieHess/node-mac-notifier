@@ -37,7 +37,7 @@ MacNotification::MacNotification(Nan::Utf8String *id,
   Nan::Utf8String *soundName,
   bool canReply,
   Nan::Utf8String *otherButtonTitle)
-  : _id(id), _title(title), _subtitle(subtitle), _body(body), _icon(icon), _soundName(soundName), _canReply(canReply), _otherButtonTitle(otherButtonTitle) {
+  : _id(id), _title(title), _subtitle(subtitle), _body(body), _icon(icon), _soundName(soundName), _otherButtonTitle(otherButtonTitle), _canReply(canReply) {
 
   NSUserNotification *notification = [[NSUserNotification alloc] init];
 
