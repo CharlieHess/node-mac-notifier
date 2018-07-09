@@ -3,16 +3,8 @@
 #include <nan.h>
 #include "mac_notification.h"
 
-struct NotificationActivationInfo {
-  Nan::Callback *callback;
-  bool isReply;
-  const char *response;
-  const char *id;
-};
-
 @interface NotificationCenterDelegate : NSObject<NSUserNotificationCenterDelegate> {
   Nan::Callback *OnActivation;
-  NotificationActivationInfo Info;
 }
 
 - (id)initWithActivationCallback:(Nan::Callback *)onActivation;
