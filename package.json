@@ -23,8 +23,8 @@
   "author": "Charlie Hess",
   "devDependencies": {
     "mocha": "^2.2.5",
-    "nan": "^2.10.0",
-    "node-gyp": "^3.7.0"
+    "nan": "2.8.0",
+    "node-gyp": "3.7.0"
   },
   "dependencies": {
     "bindings": "^1.2.1",
