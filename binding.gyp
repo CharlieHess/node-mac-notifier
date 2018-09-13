@@ -1,6 +1,8 @@
 {
-  'targets': [
-  ],
+  'targets': [{
+    "target_name": "Notification",
+    "sources": [],
+  }],
   'conditions': [
     ['OS=="mac"', {
       'targets': [{
