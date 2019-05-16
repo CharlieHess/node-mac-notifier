@@ -185,6 +185,20 @@ void MacNotification::RegisterDelegateFromOptions(Local<Object> options) {
   NotificationCenterDelegate *delegate = [[NotificationCenterDelegate alloc] initWithActivationCallback:activated];
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   center.delegate = delegate;
+
+#if NODE_MAJOR_VERSION >= 10
+  node::AddEnvironmentCleanupHook(
+    v8::Isolate::GetCurrent(),
+    [](void *arg) {
+      auto our_delegate = static_cast<NotificationCenterDelegate*>(arg);
+      NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
+      if (center.delegate == our_delegate) {
+        center.delegate = nil;
+      }
+    },
+    const_cast<void*>(static_cast<const void*>(delegate))
+  );
+#endif
 }
 
 Nan::Utf8String* MacNotification::StringFromObjectOrNull(Local<Object> object, const char *key) {
