@@ -19,9 +19,9 @@
   ],
   "author": "Charlie Hess",
   "devDependencies": {
-    "mocha": "^2.2.5",
-    "nan": "2.8.0",
-    "node-gyp": "3.7.0"
+    "mocha": "^6.1.4",
+    "nan": "^2.13.2",
+    "node-gyp": "^4.0.0"
   },
   "dependencies": {
     "bindings": "^1.2.1",
