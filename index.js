@@ -18,12 +18,14 @@ module.exports = class Notification extends EventTarget {
     options.body = options.body || '';
     options.canReply = !!options.canReply;
 
-    const activated = (isReply, response, id) => {
+    const activated = (isReply, response, id, isOtherButton) => {
       const notification = this.getNotificationById(id);
       if (!notification) return;
 
       if (isReply) {
         notification.dispatchEvent({ type: 'reply', response });
+      } else if (isOtherButton) {
+        notification.dispatchEvent({ type: 'other' });
       } else {
         notification.dispatchEvent({ type: 'click' });
       }

@@ -15,4 +15,7 @@
 - (void)userNotificationCenter:(NSUserNotificationCenter *)center
        didActivateNotification:(NSUserNotification *)notification;
 
+- (void)userNotificationCenter:(NSUserNotificationCenter *)center
+       didDismissAlert:(NSUserNotification *)alert;
+
 @end

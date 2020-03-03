@@ -7,6 +7,7 @@ struct NotificationActivationInfo {
   bool isReply;
   std::string response;
   std::string id;
+  bool isOtherButton;
 };
 
 @implementation NotificationCenterDelegate
@@ -26,14 +27,15 @@ static void AsyncSendHandler(uv_async_t *handle) {
 
   NSLog(@"Invoked notification with id: %s", info->id.c_str());
 
-  v8::Local<v8::Value> argv[3] = {
+  v8::Local<v8::Value> argv[4] = {
     Nan::New(info->isReply),
     Nan::New(info->response).ToLocalChecked(),
-    Nan::New(info->id).ToLocalChecked()
+    Nan::New(info->id).ToLocalChecked(),
+    Nan::New(info->isOtherButton)
   };
 
   Nan::AsyncResource async_resource("NodeMacNotifier:AsyncSendHandler");
-  info->callback->Call(3, argv, &async_resource);
+  info->callback->Call(4, argv, &async_resource);
 
   delete info;
   info = nullptr;
@@ -55,6 +57,21 @@ static void AsyncSendHandler(uv_async_t *handle) {
   return self;
 }
 
+- (void)userNotificationCenter:(NSUserNotificationCenter *)center
+        didDismissAlert:(NSUserNotification *)notification
+{
+  auto *info = new NotificationActivationInfo();
+  info->isReply = false;
+  info->id = notification.identifier.UTF8String;
+  info->callback = OnActivation;
+  info->isOtherButton = true;
+
+  auto *async = new uv_async_t();
+  async->data = info;
+  uv_async_init(uv_default_loop(), async, (uv_async_cb)AsyncSendHandler);
+  uv_async_send(async);
+}
+
 /**
  * Occurs when the user activates a notification by clicking it or replying.
  */
@@ -65,6 +82,7 @@ static void AsyncSendHandler(uv_async_t *handle) {
   info->isReply = notification.activationType == NSUserNotificationActivationTypeReplied;
   info->id = notification.identifier.UTF8String;
   info->callback = OnActivation;
+  info->isOtherButton = false;
 
   if (info->isReply) {
     info->response = notification.response.string.UTF8String;
