@@ -52,6 +52,9 @@ Additional parameters to the notification.
 * #### `options.canReply` (bool)
   If true, this notification will have a reply action button, and can emit the `reply` event. Maps to `NSUserNotification.hasReplyButton`.
 
+* #### `options.otherButtonTitle` (string)
+  Label for the close button on the notification. Listen for clicks on this button by adding an event listener for `other`.
+
 * #### `options.bundleId` (string)
   Set this to override the `NSBundle.bundleIdentifier` used for the notification. This is a brute force way for your notifications to take on the appropriate app icon.
 
